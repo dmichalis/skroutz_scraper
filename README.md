@@ -1,0 +1,1 @@
+# skroutz_common_shops
