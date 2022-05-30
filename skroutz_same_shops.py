@@ -3,13 +3,6 @@ import requests
 import csv
 import re
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.support import expected_conditions as EC
 from necessary_functions.check_times import check_if_and_times
 from necessary_functions.class_shop import Shops
 
@@ -84,12 +77,13 @@ if len(sim_indices) >= 1:
         try: #in case the product is available in the shop            
             p = Shops(url[i], shop_strings)    
             product = p._product_name()
-            shop_url = p._shop_url()
-            name = p._name()
             price = p._prices()
-            rating, tot_rev = p._rating()
-            avail = p._availability()
-            loc = p._location()
+            if i == 0: #the objects are identical to all products so they are created once
+                shop_url = p._shop_url()
+                name = p._name()
+                rating, tot_rev = p._rating()
+                avail = p._availability()
+                loc = p._location()
             #----------------------------------------------------------------
 
             #------------------Print the results in the csv file--------------------
