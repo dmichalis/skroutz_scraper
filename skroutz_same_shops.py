@@ -98,7 +98,7 @@ if len(sim_indices) >= 1:
             wr.writerows('-')        
             #---------------------------------------------------------------------- 
         except:
-            print('Product not available in shop number', i+1)       
+            continue       
 else:
     print('No common shops were found in the provided urls.')
 #---------------------------------------------------------------------
