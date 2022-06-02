@@ -98,8 +98,8 @@ class Shops(object):
         total_reviews = []
         for i in range(len(self.shops)):
             elem4 = WebDriverWait(self.driver, 15).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{self.shops[i]}']/div[1]/div[@class='shop']/div/div[2]/a/div")))
-            rating.append(elem4.text.split()[1])    
-            total_reviews.append(elem4.text.split()[0])
+            rating.append(float(elem4.text.split()[1]))     
+            total_reviews.append(int(elem4.text.split()[0]))
     
         return rating, total_reviews
     #--------------------------------------------
