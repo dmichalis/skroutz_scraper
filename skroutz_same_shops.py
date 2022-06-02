@@ -1,7 +1,6 @@
 import numpy as np
 import requests
 import csv
-import re
 from bs4 import BeautifulSoup
 from necessary_functions.check_times import check_if_and_times
 from necessary_functions.class_shop import Shops
