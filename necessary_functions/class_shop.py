@@ -15,8 +15,7 @@ class Shops(object):
     def __init__(self, url, shops): 
         self.driver = webdriver.Chrome() 
         self.driver.get(url)
-        headers = {'user-agent': 'customize header string', 'Accept-Encoding': 'gzip, deflate, br', 'Content-Type': 'application/json; charset=utf-8'}
-        html = requests.get(url, headers=headers)
+        html = requests.get(url)
         self.shops = shops    
     
     #----------Get the product name--------------
