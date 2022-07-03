@@ -1,9 +1,10 @@
 import numpy as np
 import requests
 import csv
-from bs4 import BeautifulSoup
-from necessary_functions.check_times import check_if_and_times
-from necessary_functions.class_shop import Shops
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from check_times import check_if_and_times
+from class_shop import Shops
 
 
 #----Read a .txt file that contains the product urls 
@@ -21,22 +22,24 @@ print('Number of products:', n_products)
 tot_counter = np.zeros(n_products, dtype=int)
 urls = []
 parts = [None]*4
-headers={'Host': 'www.skroutz.gr' ,'User-Agent': 'Mozilla/5.0'}
 
 for i in range(n_products):    
-    html = requests.get(url[i], headers = headers)
-    soup = BeautifulSoup(html.content, 'lxml')
-    results = soup('li', class_ = ['card js-product-card', 'card js-product-card has-pro-badge'])
-    shop_count = 0
+    driver = webdriver.Chrome() 
+    driver.get(url[i])
+    results = driver.find_elements(By.XPATH, "//*[@class='card js-product-card' or @class='card js-product-card has-pro-badge']")
     
+    #results = soup('li', class_ = ['card js-product-card', 'card js-product-card has-pro-badge'])
+    shop_count = 0
+
     #find the common shops by comparing shop ids
     for result in results:
-        shop_ids = result.get('id', None)
+        shop_ids = result.get_attribute('id')
         parts = shop_ids.split('-')
         shop_id = int(parts[1])
         urls.append(shop_id)
         shop_count = shop_count + 1
 
+    driver.close()     
     #Keep the total number of shops that provide each product
     tot_counter[i] = shop_count
 
@@ -62,7 +65,7 @@ if len(sim_indices) >= 1:
     last_nonzero = np.max(np.nonzero(sim_tot))
     optimal_list = sim_indices[-sim_tot[last_nonzero]:]
     #----------------------------------------------------------
-    
+
     shop_strings = []
     for j in range(len(optimal_list)):
         shop_strings.append('shop-'+str(optimal_list[j]))
@@ -74,6 +77,7 @@ if len(sim_indices) >= 1:
     wr = csv.writer(f)
     wr.writerow(header)
 
+    
     for i in range(n_products):
         try: #in case the product is available in the shop            
             p = Shops(url[i], shop_strings)    
@@ -88,7 +92,7 @@ if len(sim_indices) >= 1:
             #----------------------------------------------------------------
 
             #------------------Print the results in the csv file--------------------
-            for j in range(len(name)):
+            for j in range(len(shop_strings)):
                 if j == 0:
                     wr.writerow([product, name[j], shop_url[j], price[j,0], price[j,1], price[j,2], price[j,3],
                     price[j,4], rating[j], tot_rev[j], avail[j], loc[j]])
