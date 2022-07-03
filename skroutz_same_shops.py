@@ -52,15 +52,17 @@ for i in range(2, n_products+1):
             pos_count = pos_count + 1
     
     sim_tot[i-2] = pos_count
-    print(i, 'of the products can be found in', pos_count, 'shops')
+    if len(sim_indices) >= 1:
+        print(i, 'of the products can be found in', pos_count, 'shops')
 
-#We are looking for the shop that has the most products that can be found at the bottom of the list
-last_nonzero = np.max(np.nonzero(sim_tot))
-optimal_list = sim_indices[-sim_tot[last_nonzero]:]
-#----------------------------------------------------------
 
 #--------Web scrap each link to retrieve the rest shop attributes-----
 if len(sim_indices) >= 1:
+    #We are looking for the shop that has the most products that can be found at the bottom of the list
+    last_nonzero = np.max(np.nonzero(sim_tot))
+    optimal_list = sim_indices[-sim_tot[last_nonzero]:]
+    #----------------------------------------------------------
+    
     shop_strings = []
     for j in range(len(optimal_list)):
         shop_strings.append('shop-'+str(optimal_list[j]))
