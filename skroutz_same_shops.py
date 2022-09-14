@@ -28,9 +28,7 @@ for i in range(n_products):
     driver.get(url[i])
     results = driver.find_elements(By.XPATH, "//*[@class='card js-product-card' or @class='card js-product-card has-pro-badge']")
     
-    #results = soup('li', class_ = ['card js-product-card', 'card js-product-card has-pro-badge'])
     shop_count = 0
-
     #find the common shops by comparing shop ids
     for result in results:
         shop_ids = result.get_attribute('id')
