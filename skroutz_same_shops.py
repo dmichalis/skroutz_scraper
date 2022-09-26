@@ -1,6 +1,6 @@
 import numpy as np
+import pandas as pd
 import requests
-import csv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from check_times import check_if_and_times
@@ -68,40 +68,35 @@ if len(sim_indices) >= 1:
     for j in range(len(optimal_list)):
         shop_strings.append('shop-'+str(optimal_list[j]))
 
-    #write csv file    
-    f = open('Skroutz_shops.csv', 'w', encoding='UTF8', newline='')
-    header = ['Product', 'Shop name', 'Shop url', 'Initial price', 'Skroutz transportation fees', 'Skroutz transaction fees', 'Shop transportation fees',
-             'Shop transaction fees', 'Rating', 'Total reviews', 'Availability', 'Location']
-    wr = csv.writer(f)
-    wr.writerow(header)
-
+    #Retrieve all characteristics of those shops that provide the majority of products
+    for i in range(n_products):   
+        p = Shops(url[i], shop_strings)    
+        product = p._product_name()
+        price = p._prices()
+        count = np.count_nonzero(price == -1) #count how many negative values returned
+        if count == len(shop_strings)*5:
+            continue #if all values are negative skip this product
+            
+        #The following characteristics are common among all products so retrieve them only once
+        if i == 0:
+            shop_url = p._shop_url()
+            name = p._name()
+            rating, tot_rev = p._rating()
+            avail = p._availability()
+            loc = p._location()
     
-    for i in range(n_products):
-        try: #in case the product is available in the shop            
-            p = Shops(url[i], shop_strings)    
-            product = p._product_name()
-            price = p._prices()
-            if i == 0: #the objects are identical to all products so they are created once
-                shop_url = p._shop_url()
-                name = p._name()
-                rating, tot_rev = p._rating()
-                avail = p._availability()
-                loc = p._location()
-            #----------------------------------------------------------------
-
-            #------------------Print the results in the csv file--------------------
-            for j in range(len(shop_strings)):
-                if j == 0:
-                    wr.writerow([product, name[j], shop_url[j], price[j,0], price[j,1], price[j,2], price[j,3],
-                    price[j,4], rating[j], tot_rev[j], avail[j], loc[j]])
-                else:
-                    wr.writerow(['>>', name[j], shop_url[j], price[j,0], price[j,1], price[j,2], price[j,3],
-                    price[j,4], rating[j], tot_rev[j], avail[j], loc[j]])
-
-            wr.writerows('-')        
-            #---------------------------------------------------------------------- 
-        except:
-            continue       
+            #initialize dataset
+            info = {'Shop name': name, 'Shop url': shop_url, 'Skroutz transportation fees': price[:,1],
+                    'Skroutz transaction fees': price[:,2], 'Shop transportation fees': price[:,3],
+                    'Shop transaction fees': price[:,4], 'Rating': rating, 'Total Reviews': tot_rev, 
+                    'Availability': avail, 'Location': loc}
+            df = pd.DataFrame(info)
+        
+        #Add the initial price
+        df.insert(2, product, price[:,0], True)
+        #----------------------------------------------------------------------        
+        
+    df.to_csv('Skroutz_shops.csv')       
 else:
     print('No common shops were found in the provided urls.')
 #---------------------------------------------------------------------
