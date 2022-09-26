@@ -30,9 +30,9 @@ class Shops(object):
         url_shop = []
         for shop in self.shops:
             try: #shop
-                elem1 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[1]/div[2]/div[@class='item']/h3/a")))
+                elem1 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[2]/div[@class='item']/h3/a")))
             except: #skroutz
-                elem1 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[1]/div[2]/div[@class='item with-ndd']/h3/a")))  
+                elem1 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[2]/div[@class='item with-ndd']/h3/a")))  
             url_shop.append(elem1.get_attribute('href'))
 
         return url_shop
@@ -42,7 +42,7 @@ class Shops(object):
     def _name(self):
         name = []
         for shop in self.shops:
-            elem2 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[1]/div[1]/div[1]/p")))
+            elem2 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[@class='shop']/div[1]/p")))
             name.append(elem2.text)
     
         return name
@@ -50,11 +50,11 @@ class Shops(object):
 
     #----------Get the total price with transportation and exchange fees--------------
     def _prices(self):
-        prices = np.zeros((len(self.shops), 5))
+        prices = -np.ones((len(self.shops), 5))
 
         for i in range(len(self.shops)):
             try:
-                elem3 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{self.shops[i]}']/div[2]/div[@class='price-content']")))
+                elem3 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{self.shops[i]}']/div[3]/div[@class='price-content']")))
             except:
                 continue 
             fees_string = elem3.text.replace(',','.')
@@ -93,7 +93,7 @@ class Shops(object):
         rating = []
         total_reviews = []
         for i in range(len(self.shops)):
-            elem4 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{self.shops[i]}']/div[1]/div[@class='shop']/div/div[2]/a/div")))
+            elem4 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{self.shops[i]}']/div[@class='shop']/div/div[2]/a")))
             rating.append(float(elem4.text.split()[1]))    
             total_reviews.append(int(elem4.text.split()[0]))
     
@@ -105,10 +105,10 @@ class Shops(object):
         availability = []
         for shop in self.shops:
             try: #shop
-                elem5 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[1]/div[@class='description']/div/div/p/span")))
+                elem5 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[@class='description']/div/p/span")))
                 availability.append(elem5.text)
             except: #skroutz
-                elem5 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[1]/div[@class='description']/div/div/div[@class='ndd-wrapper']/p/span")))
+                elem5 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[@class='description']/div/div[@class='ndd-wrapper']/p/span")))
                 text = elem5.text.split()
                 availability.append(text[0] + ' ' + text[1] + ' ' + text[2])    
             
@@ -119,14 +119,8 @@ class Shops(object):
     def _location(self):
         location = []
         for shop in self.shops:
-            elem6 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[1]/div[2]/div/div[@class='product-info']/span")))
-            if len(elem6.text.split()) == 2:
-                location.append(elem6.text.split()[0].split(',')[0] + ':' + elem6.text.split()[1])
-            else:    
-                location.append(elem6.text.split()[0])
+            elem6 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{shop}']/div[@class='description']/div/span")))
+            location.append(elem6.text.split(',')[0] + ':' + elem6.text.split(',')[1])
 
         return location
     #--------------------------------------------
-    
-    def __del__(self):
-        self.driver.close() 
