@@ -53,40 +53,37 @@ class Shops(object):
         prices = np.zeros((len(self.shops), 5))
 
         for i in range(len(self.shops)):
-            elem3 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{self.shops[i]}']/div[2]/div[@class='price-content']")))
+            try:
+                elem3 = WebDriverWait(self.driver, 6).until(EC.visibility_of_element_located((By.XPATH, f"//li[@id='{self.shops[i]}']/div[2]/div[@class='price-content']")))
+            except:
+                continue 
             fees_string = elem3.text.replace(',','.')
             fees = fees_string.split()
 
-            try:
-                #Depending on whether the product is provided by skroutz or shop the length of the matrix changes
-                store = 'κατάστημα'
-                sk = 'Skroutz'
-                times_store = check_if_and_times(store, fees)
-                times_skroutz = check_if_and_times(sk, fees)
-                #concanate terms to shorten if clause
-                posib = str(times_store)+str(times_skroutz)
-                
-                #isolate the float number from the string
-                iso_prices = [float(iso_prices) for iso_prices in re.findall(r'\d+\.?\d*', fees_string)]
+            #Depending on whether the product is provided by skroutz or shop the length of the matrix changes
+            store = 'κατάστημα'
+            sk = 'Skroutz'
+            times_store = check_if_and_times(store, fees)
+            times_skroutz = check_if_and_times(sk, fees)
+            #concanate terms to shorten if clause
+            posib = str(times_store)+str(times_skroutz)
+            
+            #isolate the float number from the string
+            iso_prices = [float(iso_prices) for iso_prices in re.findall(r'\d+\.?\d*', fees_string)]
 
-                #fill the prices matrix for each product
-                prices[i,0] = iso_prices[0]
-                if posib == '01':
-                    prices[i,1] = iso_prices[1]
-                    prices[i,2] = iso_prices[2]
-                elif posib == '10':
-                    prices[i,3] = iso_prices[1]
-                    prices[i,4] = iso_prices[2]
-                elif times_store == 1 and times_skroutz == 1: 
-                    prices[i,1] = iso_prices[1]
-                    prices[i,2] = iso_prices[2]
-                    prices[i,3] = iso_prices[4]
-                    prices[i,4] = iso_prices[5]
-            except:
-                #Could not retrieve additional fees
-                prices[i,0] = iso_prices[0]
-                for j in range(1,5):
-                    prices[i,j] = 0
+            #fill the prices matrix for each product
+            prices[i,0] = iso_prices[0]
+            if posib == '01':
+                prices[i,1] = iso_prices[1]
+                prices[i,2] = iso_prices[2]
+            elif posib == '10':
+                prices[i,3] = iso_prices[1]
+                prices[i,4] = iso_prices[2]
+            elif times_store == 1 and times_skroutz == 1: 
+                prices[i,1] = iso_prices[1]
+                prices[i,2] = iso_prices[2]
+                prices[i,3] = iso_prices[4]
+                prices[i,4] = iso_prices[5]
 
         return prices
     #---------------------------------------------
